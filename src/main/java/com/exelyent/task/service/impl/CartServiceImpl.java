@@ -51,8 +51,16 @@ public class CartServiceImpl implements CartService {
     public ApiResponse.CartResponse addItemToCart(Long userId, CartRequest.AddItem request) {
         Cart cart = getOrCreateCart(userId);
 
+        if (request.getProductId() == null) {
+            throw new BusinessException("Product ID must not be null");
+        }
+
         Product product = productRepository.findByIdAndActiveTrue(request.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", request.getProductId()));
+
+        if (request.getQuantity() == null || request.getQuantity() < 1) {
+            throw new BusinessException("Quantity must be at least 1");
+        }
 
         if (!product.hasEnoughStock(request.getQuantity())) {
             throw new BusinessException(
@@ -66,10 +74,14 @@ public class CartServiceImpl implements CartService {
         if (existingItem.isPresent()) {
             CartItem item = existingItem.get();
             int newQty = item.getQuantity() + request.getQuantity();
+
             if (!product.hasEnoughStock(newQty)) {
-                throw new BusinessException(
-                        String.format("Cannot add %d more. Available stock: %d, already in cart: %d",
-                                request.getQuantity(), product.getStockQuantity(), item.getQuantity()));
+                throw new BusinessException(String.format(
+                        "Cannot add %d more of '%s'. Available: %d, already in cart: %d",
+                        request.getQuantity(),
+                        product.getName(),
+                        product.getStockQuantity() != null ? product.getStockQuantity() : 0,
+                        item.getQuantity()));
             }
             item.setQuantity(newQty);
             cartItemRepository.save(item);
@@ -78,6 +90,10 @@ public class CartServiceImpl implements CartService {
             newItem.setCart(cart);
             newItem.setProduct(product);
             newItem.setQuantity(request.getQuantity());
+            if (product.getPrice() == null) {
+                throw new BusinessException(
+                        "Product '" + product.getName() + "' has no price set");
+            }
             newItem.setPriceAtAddTime(product.getPrice());
             cart.addItem(newItem);
         }
@@ -90,6 +106,9 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public ApiResponse.CartResponse updateCartItem(Long userId, Long cartItemId, CartRequest.UpdateItem request) {
+        if (request.getQuantity() == null || request.getQuantity() < 1) {
+            throw new BusinessException("Quantity must be at least 1");
+        }
         Cart cart = getOrCreateCart(userId);
 
         CartItem item = cart.getCartItems().stream()
@@ -98,9 +117,16 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new ResourceNotFoundException("CartItem", "id", cartItemId));
 
         Product product = item.getProduct();
+
+        if (product == null) {
+            throw new BusinessException("Product linked to cart item no longer exists");
+        }
+
         if (!product.hasEnoughStock(request.getQuantity())) {
-            throw new BusinessException(
-                    String.format("Insufficient stock. Available: %d", product.getStockQuantity()));
+            throw new BusinessException(String.format(
+                    "Insufficient stock for '%s'. Available: %d",
+                    product.getName(),
+                    product.getStockQuantity() != null ? product.getStockQuantity() : 0));
         }
 
         item.setQuantity(request.getQuantity());
@@ -148,6 +174,11 @@ public class CartServiceImpl implements CartService {
     }
 
     private ApiResponse.CartResponse mapToResponse(Cart cart) {
+
+        List<CartItem> cartItems = cart.getCartItems();
+        if (cartItems == null) {
+            cartItems = Collections.emptyList();
+        }
         List<ApiResponse.CartItemResponse> items = cart.getCartItems().stream()
                 .map(ci -> {
                     ApiResponse.CartItemResponse item = new ApiResponse.CartItemResponse();
@@ -165,7 +196,7 @@ public class CartServiceImpl implements CartService {
 
         ApiResponse.CartResponse response = new ApiResponse.CartResponse();
         response.setId(cart.getId());
-        response.setUserId(cart.getUser().getId());
+        response.setUserId(cart.getUser() != null ? cart.getUser().getId() : null);
         response.setItems(items);
         response.setTotalItems(cart.getTotalItems());
         response.setTotalPrice(cart.getTotalPrice());
