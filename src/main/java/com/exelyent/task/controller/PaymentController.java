@@ -53,27 +53,6 @@ public class PaymentController {
 
 
     @PostMapping("/stripe/webhook")
-//    public ResponseEntity<String> handleWebhook(
-//            @RequestBody String payload,
-//            @RequestHeader("Stripe-Signature") String sigHeader) {
-//
-//        try {
-//            Event event = Webhook.constructEvent(
-//                    payload,
-//                    sigHeader,
-//                    stripeConfig.getWebhookSecret()
-//            );
-//
-//            System.out.println("✅ Event received: " + event.getType());
-//
-//            return ResponseEntity.ok("OK");
-//
-//        } catch (Exception e) {
-//            e.printStackTrace(); // 👈 IMPORTANT for debugging
-//            return ResponseEntity.badRequest().body("Webhook Error");
-//        }
-//    }
-//    @PostMapping("/stripe/webhook")
     public ResponseEntity<String> handleWebhook(
             @RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader) {

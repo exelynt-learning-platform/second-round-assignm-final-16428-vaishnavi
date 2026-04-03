@@ -20,13 +20,6 @@ public class AuthController {
         this.authService = authService;
     }
 
- // ⚠️  DEVELOPMENT ONLY — remove or secure before production
-    @PostMapping("/register/admin")
-    public ResponseEntity<ApiResponse.AuthResponse> registerAdmin(
-            @Valid @RequestBody AuthRequest.Register request) {
-        return ResponseEntity.ok(authService.registerAdmin(request));
-    }
-    
     @PostMapping("/register")
     public ResponseEntity<ApiResponse.AuthResponse> register(
             @Valid @RequestBody AuthRequest.Register request) {

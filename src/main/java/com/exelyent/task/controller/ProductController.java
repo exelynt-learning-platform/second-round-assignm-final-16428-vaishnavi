@@ -47,7 +47,6 @@ public class ProductController {
                 productService.searchProducts(category, minPrice, maxPrice, keyword, pageable));
     }
 
-    // ─── Admin ───────────────────────────────────────────────────────────────
 
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

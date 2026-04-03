@@ -56,7 +56,6 @@ public class OrderController {
         return ResponseEntity.ok(orderService.cancelOrder(userDetails.getId(), orderId));
     }
 
-    // ─── Admin ───────────────────────────────────────────────────────────────
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
