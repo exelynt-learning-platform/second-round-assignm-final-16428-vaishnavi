@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.util.Collections;
 import com.exelyent.task.dto.ApiResponse;
 import com.exelyent.task.dto.CartRequest;
 import com.exelyent.task.entity.Cart;
@@ -161,8 +161,6 @@ public class CartServiceImpl implements CartService {
         return mapToResponse(cart);
     }
 
-    // ─── Helpers ────────────────────────────────────────────────────────────
-
     private Cart getOrCreateCart(Long userId) {
         return cartRepository.findByUserIdWithItems(userId).orElseGet(() -> {
             var user = userRepository.findById(userId)
@@ -175,10 +173,8 @@ public class CartServiceImpl implements CartService {
 
     private ApiResponse.CartResponse mapToResponse(Cart cart) {
 
-        List<CartItem> cartItems = cart.getCartItems();
-        if (cartItems == null) {
-            cartItems = Collections.emptyList();
-        }
+        List<CartItem> cartItems = cart.getCartItems()!= null ? cart.getCartItems() : Collections.emptyList();
+        
         List<ApiResponse.CartItemResponse> items = cart.getCartItems().stream()
                 .map(ci -> {
                     ApiResponse.CartItemResponse item = new ApiResponse.CartItemResponse();

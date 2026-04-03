@@ -125,7 +125,7 @@ public class AuthServiceImpl implements AuthService {
 		String refreshToken = tokenProvider.generateRefreshToken(userDetails);
 
 		User user = userRepository.findByUsernameOrEmail(request.getUsernameOrEmail(), request.getUsernameOrEmail())
-				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+				.orElseThrow(() -> new ResourceNotFoundException("User", "usernameOrEmail", request.getUsernameOrEmail()));
 
 		log.info("User logged in: {}", user.getEmail());
 		return buildAuthResponse(accessToken, refreshToken, user);

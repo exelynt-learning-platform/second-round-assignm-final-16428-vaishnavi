@@ -57,7 +57,6 @@ public class SecurityConfig {
                             "/auth/register",
                             "/auth/login",
                             "/auth/refresh",
-                            "/auth/register/admin").permitAll()
                     .requestMatchers(HttpMethod.GET,
                             "/products",
                             "/products/**").permitAll()
