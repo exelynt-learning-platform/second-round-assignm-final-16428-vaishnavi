@@ -50,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
         Cart cart = cartRepository.findByUserIdWithItems(userId)
                 .orElseThrow(() -> new BusinessException("Cart not found for user"));
 
-        if (cart.getCartItems().isEmpty()) {
+        if (cart.getCartItems().isEmpty() || cart.getCartItems() == null) {
             throw new BusinessException("Cannot create order from an empty cart");
         }
 
@@ -106,7 +106,8 @@ public class OrderServiceImpl implements OrderService {
 
         order.getOrderItems().forEach(item -> {
             Product product = item.getProduct();
-            product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+            int currentStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+            product.setStockQuantity(currentStock + item.getQuantity());
             productRepository.save(product);
         });
 

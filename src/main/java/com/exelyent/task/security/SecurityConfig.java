@@ -56,10 +56,8 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.POST,
                             "/auth/register",
                             "/auth/login",
-                            "/auth/refresh",
-                    .requestMatchers(HttpMethod.GET,
-                            "/products",
-                            "/products/**").permitAll()
+                            "/auth/refresh").permitAll()
+                    .requestMatchers(HttpMethod.GET,"/products","/products/**").permitAll()
                     .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                     .requestMatchers("/stripe/webhook").permitAll()

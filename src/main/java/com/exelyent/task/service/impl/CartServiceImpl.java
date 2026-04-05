@@ -173,9 +173,10 @@ public class CartServiceImpl implements CartService {
 
     private ApiResponse.CartResponse mapToResponse(Cart cart) {
 
-        List<CartItem> cartItems = cart.getCartItems()!= null ? cart.getCartItems() : Collections.emptyList();
+        // List<CartItem> cartItems = cart.getCartItems()!= null ? cart.getCartItems() : Collections.emptyList();
         
-        List<ApiResponse.CartItemResponse> items = cart.getCartItems().stream()
+        // List<ApiResponse.CartItemResponse> items = cart.getCartItems().stream()
+        List<ApiResponse.CartItemResponse> items = cartItems.stream()
                 .map(ci -> {
                     ApiResponse.CartItemResponse item = new ApiResponse.CartItemResponse();
                     item.setId(ci.getId());
