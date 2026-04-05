@@ -138,7 +138,7 @@ public class AuthServiceImpl implements AuthService {
 		}
 		String username = tokenProvider.extractUsername(refreshToken);
 		User user = userRepository.findByUsernameOrEmail(username, username)
-				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+				.orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
 		CustomUserDetails userDetails = new CustomUserDetails(user);
 		String newAccessToken = tokenProvider.generateAccessToken(userDetails);
